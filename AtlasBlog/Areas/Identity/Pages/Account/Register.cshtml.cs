@@ -92,9 +92,7 @@ namespace AtlasBlog.Areas.Identity.Pages.Account
 
             public string LastName { get; set; }
             
-            [Display(Name = "Display Name")]
-            [StringLength(40, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 1)]
-            public string DisplayName { get; set; }
+           
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -132,7 +130,7 @@ namespace AtlasBlog.Areas.Identity.Pages.Account
                 var user = CreateUser();
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
-                user.DisplayName = Input.DisplayName;
+              
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
