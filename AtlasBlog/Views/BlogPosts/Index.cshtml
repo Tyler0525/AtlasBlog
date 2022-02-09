@@ -19,16 +19,10 @@
                 @Html.DisplayNameFor(model => model.Abstract)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.BlogPostState)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Body)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Created)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Updated)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Blog)
             </th>
             <th></th>
         </tr>
@@ -43,16 +37,10 @@
                 @Html.DisplayFor(modelItem => item.Abstract)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.BlogPostState)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Body)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Created)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Updated)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Blog.BlogName)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
