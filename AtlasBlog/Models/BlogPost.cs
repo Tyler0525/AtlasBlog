@@ -15,7 +15,7 @@ namespace AtlasBlog.Models
 
         public string Slug { get; set; } = "";
 
-        [Display(Name = "Is Deleted")]
+        [Display(Name = "Marked for Deletion")]
         public bool IsDeleted { get; set; } = false;
 
         [Required]
