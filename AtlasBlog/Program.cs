@@ -1,6 +1,7 @@
 using AtlasBlog.Data;
 using AtlasBlog.Models;
 using AtlasBlog.Services;
+using AtlasBlog.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +26,7 @@ builder.Services.AddControllersWithViews();
 
 
 builder.Services.AddTransient<DataService>();
+builder.Services.AddScoped<IImageService, BasicImageService>();
 
 //The line if Demar...
 var app = builder.Build();

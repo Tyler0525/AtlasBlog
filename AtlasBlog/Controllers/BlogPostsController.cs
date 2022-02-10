@@ -8,12 +8,17 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AtlasBlog.Data;
 using AtlasBlog.Models;
+using AtlasBlog.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AtlasBlog.Controllers
 {
+
+    [Authorize(Roles = "Administrator")]
     public class BlogPostsController : Controller
     {
         private readonly ApplicationDbContext _context;
+       
 
         public BlogPostsController(ApplicationDbContext context)
         {
@@ -21,6 +26,7 @@ namespace AtlasBlog.Controllers
         }
 
         // GET: BlogPosts
+       [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.BlogPosts.Include(b => b.Blog);
@@ -28,6 +34,7 @@ namespace AtlasBlog.Controllers
         }
 
         // GET: BlogPosts/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -47,6 +54,8 @@ namespace AtlasBlog.Controllers
         }
 
         // GET: BlogPosts/Create
+
+        
         public IActionResult Create()
         {
             ViewData["BlogId"] = new SelectList(_context.Blogs, "Id", "BlogName");
@@ -94,7 +103,7 @@ namespace AtlasBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Title,Slug,IsDeleted,Abstract,BlogPostState,Body,Created")] BlogPost blogPost)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Slug,IsDeleted,Abstract,BlogPostState,Body,Created")] BlogPost blogPost)
         {
             if (id != blogPost.Id)
             {
@@ -104,8 +113,10 @@ namespace AtlasBlog.Controllers
             if (ModelState.IsValid)
             {
                 try
-                {
+                {   
+                    blogPost.Updated = DateTime.UtcNow;
                     blogPost.Created = DateTime.SpecifyKind(blogPost.Created, DateTimeKind.Utc);
+
                     _context.Update(blogPost);
                     await _context.SaveChangesAsync();
                 }

@@ -8,25 +8,32 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AtlasBlog.Data;
 using AtlasBlog.Models;
+using AtlasBlog.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AtlasBlog.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class BlogsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IImageService _imageService;
 
-        public BlogsController(ApplicationDbContext context)
+        public BlogsController(ApplicationDbContext context, IImageService imageService)
         {
             _context = context;
+            _imageService = imageService;
         }
 
         // GET: Blogs
+       [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Blogs.ToListAsync());
         }
 
         // GET: Blogs/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,6 +52,8 @@ namespace AtlasBlog.Controllers
         }
 
         // GET: Blogs/Create
+
+        
         public IActionResult Create()
         {
             return View();
@@ -55,10 +64,18 @@ namespace AtlasBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BlogName,Description")] Blog blog)
+        public async Task<IActionResult> Create([Bind("BlogName,Description")] Blog blog, IFormFile imageFile)
         {
             if (ModelState.IsValid)
             {
+                if (imageFile is not null)
+                {
+                    blog.ImageData = await _imageService.ConvertFileToByteArrayAsync(imageFile);
+                    blog.ImageType = imageFile.ContentType;
+                }
+
+
+
                 //Specify the DateTime kind for the incoming Created Date 
                 blog.Created = DateTime.UtcNow;
 
@@ -70,6 +87,7 @@ namespace AtlasBlog.Controllers
         }
 
         // GET: Blogs/Edit/5
+       
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -121,6 +139,7 @@ namespace AtlasBlog.Controllers
         }
 
         // GET: Blogs/Delete/5
+        
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
