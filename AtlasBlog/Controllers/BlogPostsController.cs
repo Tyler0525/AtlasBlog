@@ -42,16 +42,19 @@ namespace AtlasBlog.Controllers
 
         // GET: BlogPosts/Details/5
         [AllowAnonymous]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string slug)
         {
-            if (id == null)
+            if(string.IsNullOrEmpty(slug))
             {
                 return NotFound();
             }
 
             var blogPost = await _context.BlogPosts
                 .Include(b => b.Blog)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Slug == slug);
+           
+            
+            
             if (blogPost == null)
             {
                 return NotFound();
@@ -81,7 +84,22 @@ namespace AtlasBlog.Controllers
                 var slug = _slugService.UrlFriendly(blogPost.Title, 100);
 
                 //I have to ensure that the Slug is unique before allowing it to be stored in the Datbase
-                blogPost.Slug = slug;
+                //If it is unique it can be used, otherwise throw custom error letting user know
+                var isUnique = !_context.BlogPosts.Any(b => b.Slug == slug);
+
+                if(isUnique)
+                {
+                    blogPost.Slug = slug;
+                }
+                else
+                {
+                    //Then Slug cannot be used and error must be shown to user
+                    ModelState.AddModelError("Title", "This Title cannot be used(duplicate Slug)");
+                    ModelState.AddModelError("", "Title cannot be used");
+                    ViewData["BlogId"] = new SelectList(_context.Blogs, "Id", "BlogName", blogPost.BlogId);
+                    return View(blogPost);
+                }
+               
 
                 blogPost.Created = DateTime.UtcNow;
                    
@@ -115,17 +133,42 @@ namespace AtlasBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Slug,IsDeleted,Abstract,BlogPostState,Body,Created")] BlogPost blogPost)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Slug,Title,IsDeleted,Abstract,BlogPostState,Body,Created")] BlogPost blogPost)
         {
             if (id != blogPost.Id)
             {
                 return NotFound();
             }
 
+            
+
             if (ModelState.IsValid)
             {
                 try
-                {   
+                {
+                    //If the Slug has changed I need to do this check
+
+                    var slug = _slugService.UrlFriendly(blogPost.Title, 100);
+                    if (blogPost.Slug != slug)
+                    {
+                        //I have to ensure that the Slug is unique before allowing it to be stored in the DB
+                        //If it is unique, it can be used otherwise we have to throw a custom error letting user know what's up
+                        var isUnique = !_context.BlogPosts.Any(b => b.Slug == slug);
+                        if (isUnique)
+                        {
+                            blogPost.Slug = slug;
+                        }
+                        else
+                        {
+                            //The slug cannot be used and an error must be shown to the user
+                            ModelState.AddModelError("Title", "This Title cannot be used (duplicate Slug)");
+                            ModelState.AddModelError("", "Title cannot be used");
+                            ViewData["BlogId"] = new SelectList(_context.Blogs, "Id", "BlogName", blogPost.BlogId);
+                            return View(blogPost);
+                        }
+
+                    }
+
                     blogPost.Updated = DateTime.UtcNow;
                     blogPost.Created = DateTime.SpecifyKind(blogPost.Created, DateTimeKind.Utc);
 
