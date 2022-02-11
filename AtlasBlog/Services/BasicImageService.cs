@@ -1,6 +1,6 @@
-﻿namespace AtlasBlog.Services.Interfaces
+﻿namespace AtlasBlog.Services
 {
-    public class BasicImageService : IImageService
+    public class BasicImageService : Interfaces.IImageService
     {
         public string ConvertByteArrayToFile(byte[] fileData, string extension)
         {

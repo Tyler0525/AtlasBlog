@@ -27,6 +27,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddTransient<DataService>();
 builder.Services.AddScoped<IImageService, BasicImageService>();
+builder.Services.AddTransient<SlugService>();
+
 
 //The line if Demar...
 var app = builder.Build();

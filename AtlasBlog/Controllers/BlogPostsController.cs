@@ -10,6 +10,7 @@ using AtlasBlog.Data;
 using AtlasBlog.Models;
 using AtlasBlog.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using AtlasBlog.Services;
 
 namespace AtlasBlog.Controllers
 {
@@ -18,15 +19,21 @@ namespace AtlasBlog.Controllers
     public class BlogPostsController : Controller
     {
         private readonly ApplicationDbContext _context;
-       
+        private readonly IImageService _imageService;
+        private readonly SlugService _slugService;
 
-        public BlogPostsController(ApplicationDbContext context)
+
+
+        public BlogPostsController(ApplicationDbContext context, SlugService slugService, IImageService imageService)
         {
             _context = context;
+            _imageService = imageService;
+            _slugService = slugService;
+            
         }
 
         // GET: BlogPosts
-       [AllowAnonymous]
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.BlogPosts.Include(b => b.Blog);
@@ -71,6 +78,11 @@ namespace AtlasBlog.Controllers
         {
             if (ModelState.IsValid)
             {
+                var slug = _slugService.UrlFriendly(blogPost.Title, 100);
+
+                //I have to ensure that the Slug is unique before allowing it to be stored in the Datbase
+                blogPost.Slug = slug;
+
                 blogPost.Created = DateTime.UtcNow;
                    
                 _context.Add(blogPost);
