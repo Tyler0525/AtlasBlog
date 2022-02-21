@@ -3,6 +3,7 @@ using System;
 using AtlasBlog.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,13 +12,14 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AtlasBlog.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220214163050_comment2")]
+    partial class comment2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.2")
+                .HasAnnotation("ProductVersion", "6.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -191,6 +193,7 @@ namespace AtlasBlog.Data.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AuthorId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("BlogPostId")
@@ -364,8 +367,10 @@ namespace AtlasBlog.Data.Migrations
             modelBuilder.Entity("AtlasBlog.Models.Comment", b =>
                 {
                     b.HasOne("AtlasBlog.Models.BlogUser", "Author")
-                        .WithMany("Comments")
-                        .HasForeignKey("AuthorId");
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("AtlasBlog.Models.BlogPost", "BlogPost")
                         .WithMany("Comments")
@@ -435,11 +440,6 @@ namespace AtlasBlog.Data.Migrations
                 });
 
             modelBuilder.Entity("AtlasBlog.Models.BlogPost", b =>
-                {
-                    b.Navigation("Comments");
-                });
-
-            modelBuilder.Entity("AtlasBlog.Models.BlogUser", b =>
                 {
                     b.Navigation("Comments");
                 });

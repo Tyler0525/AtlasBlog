@@ -36,9 +36,10 @@ namespace AtlasBlog.Models
 
 
         //Navigation Properties
-        public Blog? Blog { get; set; } 
+        public Blog? Blog { get; set; }
 
-        //Tags
+
         //Comments
+        public ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
     }
 }

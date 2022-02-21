@@ -50,6 +50,51 @@
         </dd>
     </dl>
 </div>
+
+
+@if(User.Identity!.IsAuthenticated)
+{
+    //Present a dimple form for collecting the comment 
+    <div class="col-8">
+    <form asp-controller="Comments" asp-action="Create">
+        <input typer="hidden" asp-for="Slug">
+        <input type="hidden" name="BlogPostId" value=@Model.Id>
+        <textarea class="form-control" name="CommentBody" rows=10 placeholder="Add Comment"></textarea>
+        <button class="btn btn-dark">SUBMIT</button>
+    </form>
+    </div>
+}   
+else
+{
+ <a class="fw-bold" asp-area="Identity"  asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Details", "BlogPosts", new{slug = Model.Slug})">Please Register/Login to leave a comment</a> 
+}
+
+
+@*Display exisiting Comments in other words foreach (var Comments in Model.Comments)*@
+<div class="container">
+<div class="row">
+    @foreach(var comment in Model.Comments.OrderByDescending(c => c.CreatedDate))
+{
+    <div class="col-12 my-2">
+        <div class="card border-dark mb-3 w-100">
+  <div class="card-header"></div>
+  <span class="float-start">Created By: @comment.Author?.FullName</span>
+   <span class="float-end">Created By: @comment.Author?.FullName</span>
+  <div class="card-body text-dark">
+    <h5 class="card-title">@comment.CommentBody</h5>
+    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+  </div>
+  @*<div class="card-footer">Posted om: @comment.CreatedDate.ToString("MMM dd, yyyy")</div>*@
+</div>
+</div>
+}
+</div>
+</div>
+
+
+    
+    
+
 <div>
      @if (User.IsInRole("Administrator"))
      {
